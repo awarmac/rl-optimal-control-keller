@@ -4,5 +4,6 @@ pandas==1.3.3
 tqdm
 gym
 joblib
+# 'sudo apt install libopenmpi-dev' for the next one
 mpi4py
 scipy
