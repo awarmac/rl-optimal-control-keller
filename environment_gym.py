@@ -173,9 +173,8 @@ class Env(gym.Env):
         return (*self.object.get_state(), *self.battery.get_state())
     
     def check_failure_status(self, force):
-        mavg = self.mavg_force * 0.9 + force * 0.1
         conds = [
-            [mavg > self.max_force, "force > self.max_force ({:.3f},{:.3f})".format(force, self.max_force)],
+            [force > self.max_force, "force > self.max_force ({:.3f},{:.3f})".format(force, self.max_force)],
             [self.battery.E <= 0, "battery.E <= 0 ({:.3f})".format(self.battery.E)],
             [self.object.x < -self.track_length / 2, "object.x < -track_length / 2 ({:.3f},{})".format(self.object.x, self.track_length)],
             [self.object.velocity < 0, "object.velocity < 0 ({:.3f})".format(self.object.velocity)],
