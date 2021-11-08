@@ -1,20 +1,13 @@
 
 from numpy.lib.function_base import bartlett
-import torch
 import torch.nn as nn
-from torch.distributions.categorical import Categorical
-from torch.optim import Adam
-import matplotlib.pyplot as plt
 from datetime import datetime as dt
-import numpy as np
-import pandas as pd
 import environment_gym
 import os
 import sys
 import pickle
 import argparse
 
-from spinup.utils.mpi_tools import mpi_fork
 import spinup.algos.pytorch.vpg.core as core
 from spinup.algos.pytorch.vpg.vpg import vpg
   
@@ -46,7 +39,7 @@ if __name__ == '__main__':
     parser.add_argument('--render', action='store_true')
     parser.add_argument('--render-matplot', action='store_true')
     parser.add_argument('--log-raw-csv', action='store_true')
-    parser.add_argument('--log-raw-csv-every', type=int, default=500, help="log once every n episodes")
+    parser.add_argument('--log-raw-csv-every', type=int, default=200, help="log once every n episodes")
     parser.add_argument('--log-dir', type=str, default="log-{}".format(dt.now().strftime("%Y-%m-%d_%H-%M-%S")))
     parser.add_argument('--exp-name', type=str, default="exp")
     parser.add_argument('--hidden-sizes', type=str, default="32")

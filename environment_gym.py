@@ -207,19 +207,13 @@ class Env(gym.Env):
         done = succ or failed
         if failed:
             reward = 0
-            # reward = 0
-            # reward = -math.exp(10)
             self.done_reason = fail_message
         elif succ:
-            reward = 100 * self.object.track_length / self.time
-            # reward = math.exp(self.object.x/self.time)
-            # reward = math.exp(10)
+            reward = 1 / self.time
             self.episode_reward += reward
             self.done_reason = "Success (t:{:.3f}, r:{:.3f})".format(self.time, self.episode_reward)
         else:
-            reward = delta_x / self.track_length
-            # reward = math.exp(self.object.x/self.time)
-            # reward = -math.exp(1 - self.object.x/self.track_length)
+            reward = 0
             self.episode_reward += reward
         
         if self.steps_beyond_done is not None:

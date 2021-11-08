@@ -1,4 +1,6 @@
+__pycache__/
 log-*
 exp*
 temp_*
 __py*
+slurm-*
