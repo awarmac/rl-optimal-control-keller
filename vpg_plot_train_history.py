@@ -16,7 +16,7 @@ if __name__ == '__main__':
     df = pd.read_csv(csv_file, sep="\t")
     keys = ["AverageEpRet", "EpLen", "AverageVVals", "LossPi", "LossV"] # df.columns
     print(keys)
-    fig, mtp_axs = plt.subplots(len(keys), sharex=True)
+    fig, mtp_axs = plt.subplots(len(keys), figsize=(14,10), sharex=True)
     print(len(mtp_axs))
     for j,k in enumerate(keys):
         mtp_axs[j].plot(df["Epoch"], df[k])

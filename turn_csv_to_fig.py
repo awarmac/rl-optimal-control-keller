@@ -55,16 +55,23 @@ def turn_csv_to_fig(args): #log_dir, num_last_files=10, go_back_percentage=0.0):
     csv_files = csv_files[(start_index):(start_index+args.num_last_files*2)]
     for i,fname in enumerate(csv_files):
         if fname.endswith(".csv"):
+            csv_file = os.path.join(csv_dir, fname)
+            info_file = os.path.join(csv_dir, os.path.basename(fname)[:-4]+"_info.txt")
+                
+            fig_file_path = os.path.join(fig_dir, os.path.basename(csv_file)[:-4] + ".jpg")
+            if os.path.exists(fig_file_path):
+                continue
             try:
                 if i > args.num_last_files*2:
                     break
                 print("{}/{} {}".format(i, len(csv_files), fname))
                 
-                csv_file = os.path.join(csv_dir, fname)
-                info_file = os.path.join(csv_dir, os.path.basename(fname)[:-4]+"_info.txt")
                 with open(info_file, mode="r") as f:
-                    info = "    ".join(f.readlines())
+                    lines = f.readlines()
+                    print(lines, len(lines))
+                    info = "    ".join(lines)
                 info = info.replace("\n", " ")
+                
                 df = pd.read_csv (csv_file)
                 # print(df)
                 
@@ -96,7 +103,8 @@ def turn_csv_to_fig(args): #log_dir, num_last_files=10, go_back_percentage=0.0):
 
                 plt.subplots_adjust(left, bottom, right, top, wspace, hspace)
                 fig.tight_layout()
-                plt.savefig(os.path.join(fig_dir, os.path.basename(csv_file)[:-4] + ".jpg"))
+                
+                plt.savefig(fig_file_path)
                 plt.close(fig)
             except Exception as e:
                 print(e)

@@ -64,7 +64,7 @@ class VPGBuffer:
         self.adv_buf[path_slice] = core.discount_cumsum(deltas, self.gamma * self.lam)
         
         # the next line computes rewards-to-go, to be targets for the value function
-        self.ret_buf[path_slice] = core.discount_cumsum(rews, self.gamma)[:-1]
+        self.ret_buf[path_slice] = core.discount_cumsum(rews, self.gamma)[:-1] 
         
         self.path_start_idx = self.ptr
 
@@ -305,7 +305,7 @@ def vpg(env_fn, actor_critic=core.MLPActorCritic, ac_kwargs=dict(),  seed=0,
 
         # Save model
         if (epoch % save_freq == 0) or (epoch == epochs-1):
-            logger.save_state({'env': env}, None)
+            logger.save_state({'env': env}, epoch)
 
         # Perform VPG update!
         update()

@@ -26,7 +26,7 @@ def get_env(args):
     if args.restore_log_dir:
         env = load_env(exp_dir)
     else:
-        env = environment_gym.Env(log_dir=exp_dir, delta_time=0.01,
+        env = environment_gym.Env(log_dir=exp_dir, delta_time=0.1,
                             track_length=args.track_length, 
                             time_limit=args.time_limit)
         if args.log_raw_csv:
