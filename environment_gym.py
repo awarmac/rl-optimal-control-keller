@@ -16,10 +16,10 @@ def runge_kutta(y_current, t, delta_time, func):
 
 class Battery():
     def __init__(self, 
-                E_0, sigma):
-        self.E_0 = E_0 
-        self.E = E_0
-        self.sigma = sigma
+                E_0, sigma, mass):
+        self.E_0 = E_0 * mass 
+        self.E = self.E_0 
+        self.sigma = sigma * mass
     def get_state(self):
         return [self.E]
 
@@ -50,16 +50,16 @@ class MovingObject():
         return [self.x, self.velocity]
 
     def move_rk4(self, propulsion_force, delta_time):
-        self.acceleration = (propulsion_force - self.velocity/self.tau) / self.mass
+        self.acceleration = (propulsion_force / self.mass - self.velocity/self.tau)
 
-        dv_dt_func = lambda v,t:(propulsion_force-v/self.tau)/self.mass
+        dv_dt_func = lambda v,t:(propulsion_force/self.mass-v/self.tau)
         self.velocity = runge_kutta(self.velocity, 0, delta_time, dv_dt_func)
         dx = self.velocity * delta_time
         self.x += dx
         return dx
 
     def move(self, propulsion_force, delta_time):
-        acceleration = (propulsion_force - self.velocity/self.tau) / self.mass
+        acceleration = (propulsion_force  / self.mass - self.velocity/self.tau)
         self.velocity += acceleration * delta_time 
         delta_x = self.velocity * delta_time
         self.x += delta_x
@@ -75,15 +75,15 @@ class Env(gym.Env):
     def __init__(self, log_dir, delta_time=0.1, 
                         track_length=10, time_limit = 20,
                         mass=1, tau=0.892, 
-                        max_force=12.2, sigma=9.93, E_0=575):
+                        max_force=12.2, sigma=9.93 * 4.184, E_0=575 * 4.184):
 
         
         self.time = 0.0
         self.delta_time = delta_time
 
-        self.battery = Battery(E_0, sigma)
+        self.battery = Battery(E_0, sigma, mass)
         self.object = MovingObject(mass, tau)
-        self.max_force = max_force
+        self.max_force = max_force * mass
         self.track_length = track_length
 
         self.time_limit = time_limit
