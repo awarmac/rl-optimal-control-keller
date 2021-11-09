@@ -11,9 +11,9 @@
 module load pytorch/1.10 gcc/9.3.0 openmpi/4.0.3
 #source fenv/bin/activate
 
-if [ $# -ne 6 ]; then
-  echo "batch_single_vpg.sh <experiment-number> <experiment-info> <hidden-sizes> <lr> <epochs> <gaussian-log-std>"
-  echo " e.g batch_single_vpg.sh 9 smallcapacity-longtrack 32,32 0.001 500 -0.5"
+if [ $# -ne 7 ]; then
+  echo "batch_single_vpg.sh <experiment-number> <experiment-info> <hidden-sizes> <lr> <epochs> <gaussian-log-std> <track-length>"
+  echo " e.g batch_single_vpg.sh 9 smallcapacity-longtrack 32,32 0.001 500 -0.5 1000"
   exit 1;
 fi
 
@@ -24,9 +24,10 @@ exp_info=$2
 hidden_sizes=$3
 lr=$4
 epochs=$5
-track_length=400
-batch_size=5000
+batch_size=20000
 gaussian_log_std=$6
+track_length=$7
+
 exp_name=exp-$exp_num-$exp_info
 mkdir -p $base_logdir/$exp_name
 echo -e "hidden_sizes:$hidden_sizes \nlr: $lr \nepochs $epochs \
