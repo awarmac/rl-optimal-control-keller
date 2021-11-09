@@ -25,12 +25,12 @@ exp_info=$2
 hidden_sizes=$3
 lr=$4
 epochs=$5
-track_length=100
+track_length=400
 batch_size=5000
 gaussian_log_std=$6
 exp_name=exp-$exp_num-$exp_info
 mkdir -p $base_logdir/$exp_name
-echo "hidden_sizes:$hidden_sizes \nlr: $lr \nepochs $epochs \
+echo -e "hidden_sizes:$hidden_sizes \nlr: $lr \nepochs $epochs \
  	\ntrack_length: $track_length \nbatch_size: $batch_size \
  	\ngaussian_log_std: $gaussian_log_std" > $base_logdir/$exp_name/exp_parameters.txt
 
