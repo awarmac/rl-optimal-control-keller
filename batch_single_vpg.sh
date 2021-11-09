@@ -1,15 +1,14 @@
 #!/bin/bash
 #SBATCH --job-name=rl-optimal-control
-#SBATCH --account=Project_2004564
-#SBATCH --partition=small
+#SBATCH --account=Project_2005209
+#SBATCH --partition=medium
 #SBATCH --time=10:00:00
-#SBATCH --ntasks=1
-#SBATCH --cpus-per-task=32
-#SBATCH --mem-per-cpu=2G
+#SBATCH --nodes=1
+#SBATCH --ntasks-per-node=1
 
 # script to read exps.txt file and run the experiments in it.
 
-module load pytorch/nvidia-19.11-py3 gcc/9.1.0 intel-mpi/18.0.5
+module load pytorch/1.10 gcc/9.3.0 openmpi/4.0.3
 #source fenv/bin/activate
 
 if [ $# -ne 6 ]; then
@@ -18,7 +17,7 @@ if [ $# -ne 6 ]; then
   exit 1;
 fi
 
-base_logdir="/scratch/project_2004564/velcontrol-rl-keller/runvpg/"
+base_logdir="/scratch/project_2005209/velcontrol-rl-keller/runvpg/"
 mkdir -p $base_logdir
 exp_num=$1
 exp_info=$2
