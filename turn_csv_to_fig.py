@@ -39,9 +39,10 @@ def plot_stepized_column(i, j, mtp_axs ,df, column):
     mtp_axs[i][j].set(ylabel=column)
     mtp_axs[i][j].grid(True)
 
-def turn_csv_to_fig(args): #log_dir, num_last_files=10, go_back_percentage=0.0):
-    csv_dir = os.path.join(args.log_dir, "csv")
-    fig_dir = os.path.join(args.log_dir, "fig")
+def turn_csv_to_fig(log_dir, num_last_files=10, go_back_percentage=0.0, 
+                    y_limits=None, time_limit=None, ):
+    csv_dir = os.path.join(log_dir, "csv")
+    fig_dir = os.path.join(log_dir, "fig")
 
     os.makedirs(fig_dir, exist_ok=True)
 
@@ -50,9 +51,9 @@ def turn_csv_to_fig(args): #log_dir, num_last_files=10, go_back_percentage=0.0):
                     key=cmp_to_key(lambda x, y: int(x.split("_")[1].split(".")[0]) - int(y.split("_")[1].split(".")[0])),
                     reverse=True
                 )
-    start_index = int(len(csv_files)*args.go_back_percentage)
+    start_index = int(len(csv_files)*go_back_percentage)
     print(start_index)
-    csv_files = csv_files[(start_index):(start_index+args.num_last_files*2)]
+    csv_files = csv_files[(start_index):(start_index+num_last_files*2)]
     for i,fname in enumerate(csv_files):
         if fname.endswith(".csv"):
             csv_file = os.path.join(csv_dir, fname)
@@ -62,7 +63,7 @@ def turn_csv_to_fig(args): #log_dir, num_last_files=10, go_back_percentage=0.0):
             if os.path.exists(fig_file_path):
                 continue
             try:
-                if i > args.num_last_files*2:
+                if i > num_last_files*2:
                     break
                 print("{}/{} {}".format(i, len(csv_files), fname))
                 
@@ -79,9 +80,9 @@ def turn_csv_to_fig(args): #log_dir, num_last_files=10, go_back_percentage=0.0):
                 keys = [["x", "velocity", "E"], 
                     ["propulsion_force", "acceleration", "reward"]]
                 y_limits = None
-                if args.y_limits is not None:
+                if y_limits is not None:
                     y_limits = []
-                    for lim in args.y_limits.split(","):
+                    for lim in y_limits.split(","):
                         x = [int(x) for x in lim.split(":")]
                         y_limits.append(x)
 
@@ -93,8 +94,8 @@ def turn_csv_to_fig(args): #log_dir, num_last_files=10, go_back_percentage=0.0):
                         mtp_axs[i][j].grid(True)
                         if y_limits is not None:
                             mtp_axs[i][j].set_ylim(y_limits[j*3+i])
-                        if args.time_limit is not None:
-                            mtp_axs[i][j].set_xlim([-1, args.time_limit])
+                        if time_limit is not None:
+                            mtp_axs[i][j].set_xlim([-1, time_limit])
                 # plot_stepized_column(-1, 1, mtp_axs, df, "propulsion_force")
                 # plot_stepized_column(-2, 1, mtp_axs, df, "acceleration")
                 
@@ -123,4 +124,4 @@ if __name__ == '__main__':
     args = parser.parse_args()
     print(args)
 
-    turn_csv_to_fig(args)
+    turn_csv_to_fig(**args)
