@@ -15,11 +15,11 @@ server=$1
 mkdir -p $exp_dir $exp_dir/csv $exp_dir/${exp_dir}_s0
 
 echo $exp_dir
-rsync -r $server:/${base_logdir}/$exp_dir/${exp_dir}_s0/ $exp_dir/${exp_dir}_s0/
+rsync -r --exclude '*.pkl' --exclude '*.pt' $server:/${base_logdir}/$exp_dir/${exp_dir}_s0/ $exp_dir/${exp_dir}_s0/
 python vpg_plot_train_history.py $exp_dir/${exp_dir}_s0
 # python vpg_run_model.py $exp_dir/${exp_dir}_s0/pyt_save/model.pt --num-episodes 5 --log-raw-csv
 
-ssh $server ls -t /${base_logdir}/$exp_dir/csv | head -n 20 | \
+ssh $server "ls /${base_logdir}/$exp_dir/csv | sort -t "_" -k 2 -n -r | head -n 20" | \
 	while read line; do
 		if [ ! -f $exp_dir/csv/$line ]; then
 			scp $server:/${base_logdir}/$exp_dir/csv/$line $exp_dir/csv/;
