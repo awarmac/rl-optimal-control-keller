@@ -86,7 +86,7 @@ class MLPGaussianActor(Actor):
         self.mu_net = mlp([obs_dim] + list(hidden_sizes) + [act_dim], activation)
 
     def _distribution(self, obs):
-        mu = self.mu_net(obs) + 10
+        mu = self.mu_net(obs) + 1
         std = torch.exp(self.log_std)
         return Normal(mu, std)
 
