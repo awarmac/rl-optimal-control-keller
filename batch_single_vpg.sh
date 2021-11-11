@@ -2,7 +2,7 @@
 #SBATCH --job-name=rl-optimal-control
 #SBATCH --account=Project_2005209
 #SBATCH --partition=medium
-#SBATCH --time=10:00:00
+#SBATCH --time=24:00:00
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1
 
@@ -24,7 +24,7 @@ exp_info=$2
 hidden_sizes=$3
 lr=$4
 epochs=$5
-batch_size=20000
+batch_size=5000
 gaussian_log_std=$6
 track_length=$7
 
