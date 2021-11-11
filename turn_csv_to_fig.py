@@ -69,7 +69,7 @@ def turn_csv_to_fig(log_dir, num_last_files=10, go_back_percentage=0.0,
                 
                 with open(info_file, mode="r") as f:
                     lines = f.readlines()
-                    print(lines, len(lines))
+                    # print(lines, len(lines))
                     info = "    ".join(lines)
                 info = info.replace("\n", " ")
                 
@@ -118,10 +118,9 @@ if __name__ == '__main__':
     parser.add_argument('log_dir', type=str)
     parser.add_argument('--num-last-files', type=int, default=10)
     parser.add_argument('--go-back-percentage', type=float, default=0.0)
-    parser.add_argument('--track-length', type=float, default=100)
     parser.add_argument('--time-limit', type=float, default=None)
     parser.add_argument('--y-limits', type=str, default=None)
     args = parser.parse_args()
     print(args)
 
-    turn_csv_to_fig(**args)
+    turn_csv_to_fig(log_dir=args.log_dir, num_last_files=args.num_last_files, go_back_percentage=args.go_back_percentage, time_limit=args.time_limit, y_limits=args.y_limits)
