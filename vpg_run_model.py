@@ -43,7 +43,8 @@ if __name__ == '__main__':
     if args.all_figs_dir is not None:
             os.makedirs(args.all_figs_dir, exist_ok=True)
 
-    for model_file in model_files:
+    for i, model_file in enumerate(model_files):
+        print("{}/{}: {}".format(i, len(model_files), model_file))
         log_dir = os.path.join(base_log_dir, os.path.basename(model_file))
         env = environment_gym.Env(log_dir=log_dir, 
                             track_length=args.track_length,
@@ -69,7 +70,6 @@ if __name__ == '__main__':
                     state = env.reset()
                     break
             
-            print("Episode Ended")
         from turn_csv_to_fig import turn_csv_to_fig
         turn_csv_to_fig(log_dir, num_last_files=1)
 
