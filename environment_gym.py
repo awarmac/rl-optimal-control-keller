@@ -127,7 +127,7 @@ class Env(gym.Env):
         os.makedirs(log_dir, exist_ok=True)
         self.log_file = None
 
-        self.set_time_max_estimate()
+        # self.set_time_max_estimate()
         self.reset()
         
     
@@ -181,10 +181,13 @@ class Env(gym.Env):
         return (*self.object.get_state(), *self.battery.get_state())
     
     def rwd_fn_log_barrier_derivative(self):
-        return (1/self.estimate_time_max) / (1 - self.time/self.estimate_time_max)
+        rw = lambda x: (1/self.time) / (1 - x/self.track_length)
+        if self.object.x > self.track_length:
+            return rw(self.track_length - 0.01)
+        return rw(self.object.x)
 
     def rwd_fn_log_barrier(self):
-        return -math.log(1 - self.time / self.estimate_time_max)
+        return -math.log(1 - self.object.x / self.track_length)
 
 
     def check_failure_status(self, force):
