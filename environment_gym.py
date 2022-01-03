@@ -173,6 +173,13 @@ class Env(gym.Env):
     def get_state(self):
         return (*self.object.get_state(), *self.battery.get_state())
     
+    def rwd_fn_log_barrier_derivative(self):
+        return (1/self.time_max) / (1 - self.time / self.time_max)
+
+    def rwd_fn_log_barrier(self):
+        return -math.log(1 - self.time / self.time_max)
+
+
     def check_failure_status(self, force):
         conds = [
             [force > self.max_force, "force > self.max_force ({:.3f},{:.3f})".format(force, self.max_force)],
@@ -209,7 +216,10 @@ class Env(gym.Env):
             reward = 0
             self.done_reason = fail_message
         elif succ:
-            reward = -math.log(1 - self.time / self.time_max)
+            if self.time > self.time_max:
+                reward = 0
+            else:
+                reward = self.rwdfn_log_barrier_derivative()
             self.episode_reward += reward
             self.done_reason = "Success (t:{:.3f}, r:{:.3f})".format(self.time, self.episode_reward)
         else:
