@@ -166,7 +166,7 @@ class Env(gym.Env):
     
     def set_time_max_estimate(self):
         self.estimate_time_max = 2000
-        const_forces = reversed(np.arange(0, self.max_force, 0.5))
+        const_forces = reversed(np.arange(0, self.max_force - self.max_force/10, 0.5))
         for cf in const_forces:
             self.reset()
             print(cf)
@@ -174,14 +174,14 @@ class Env(gym.Env):
                 state, reward, done, status = self.step([cf])
                 if done and status["succ"]:
                     print(cf, self.time)
-                    self.estimate_time_max = self.time
+                    self.estimate_time_max = self.time + self.delta_time/2
                     return 
                 
     def get_state(self):
         return (*self.object.get_state(), *self.battery.get_state())
     
     def rwd_fn_log_barrier_derivative(self):
-        return (1/self.estimate_time_max) / (1 - self.time / self.estimate_time_max)
+        return (1/self.estimate_time_max) / (1 - self.time/self.estimate_time_max)
 
     def rwd_fn_log_barrier(self):
         return -math.log(1 - self.time / self.estimate_time_max)
