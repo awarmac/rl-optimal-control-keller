@@ -80,7 +80,6 @@ class Env(gym.Env):
         
         self.time = 0.0
         self.delta_time = delta_time
-        self.time_max = 2000
 
         self.battery = Battery(E_0, sigma, mass)
         self.object = MovingObject(mass, tau)
@@ -93,7 +92,7 @@ class Env(gym.Env):
         self.mtp_axs = None
         self.observation_space = [len(self.get_state())]
         self.episode_count = 1
-        self.reset()
+
 
         high = np.array(
             [
@@ -126,15 +125,11 @@ class Env(gym.Env):
         self.log_raw_csv_every = 1
 
         os.makedirs(log_dir, exist_ok=True)
-
-        # with open(os.path.join(log_dir, "info.txt"), mode="w") as f:
-        #     print(",".join(["delta_time", "track_length", "time_limit", "mass", "mu", 
-        #     "capacity","max_current","voltage_0","state_of_charge_0"]), file=f)
-        #     print(",".join([                    
-        #             str(x) for x in 
-        #                 [delta_time, track_length, time_limit, mass, mu, capacity, max_current, voltage_0, state_of_charge_0]
-        #         ]), file=f)
         self.log_file = None
+
+        self.set_time_max_estimate()
+        self.reset()
+        
     
     def enable_log_raw_csv(self, every):
         self.log_raw_csv = True
@@ -169,15 +164,27 @@ class Env(gym.Env):
 
         return np.array(self.get_state(), dtype=np.float32)
     
-
+    def set_time_max_estimate(self):
+        self.estimate_time_max = 2000
+        const_forces = reversed(np.arange(0, self.max_force, 0.5))
+        for cf in const_forces:
+            self.reset()
+            print(cf)
+            while True:
+                state, reward, done, status = self.step([cf])
+                if done and status["succ"]:
+                    print(cf, self.time)
+                    self.estimate_time_max = self.time
+                    return 
+                
     def get_state(self):
         return (*self.object.get_state(), *self.battery.get_state())
     
     def rwd_fn_log_barrier_derivative(self):
-        return (1/self.time_max) / (1 - self.time / self.time_max)
+        return (1/self.estimate_time_max) / (1 - self.time / self.estimate_time_max)
 
     def rwd_fn_log_barrier(self):
-        return -math.log(1 - self.time / self.time_max)
+        return -math.log(1 - self.time / self.estimate_time_max)
 
 
     def check_failure_status(self, force):
@@ -212,18 +219,14 @@ class Env(gym.Env):
         succ = (self.object.x >= self.track_length)
         
         done = succ or failed
+        reward = self.rwd_fn_log_barrier_derivative()
         if failed:
             reward = 0
             self.done_reason = fail_message
         elif succ:
-            if self.time > self.time_max:
-                reward = 0
-            else:
-                reward = self.rwd_fn_log_barrier_derivative()
             self.episode_reward += reward
             self.done_reason = "Success (t:{:.3f}, r:{:.3f})".format(self.time, self.episode_reward)
         else:
-            reward = 0
             self.episode_reward += reward
         
         if self.steps_beyond_done is not None:
