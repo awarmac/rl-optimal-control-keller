@@ -80,6 +80,7 @@ class Env(gym.Env):
         
         self.time = 0.0
         self.delta_time = delta_time
+        self.time_max = 2000
 
         self.battery = Battery(E_0, sigma, mass)
         self.object = MovingObject(mass, tau)
@@ -208,7 +209,7 @@ class Env(gym.Env):
             reward = 0
             self.done_reason = fail_message
         elif succ:
-            reward = 1 / self.time
+            reward = -math.log(1 - self.time_max / self.time)
             self.episode_reward += reward
             self.done_reason = "Success (t:{:.3f}, r:{:.3f})".format(self.time, self.episode_reward)
         else:
