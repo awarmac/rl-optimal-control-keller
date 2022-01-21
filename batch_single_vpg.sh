@@ -12,8 +12,10 @@ module load pytorch/1.10 gcc/9.3.0 openmpi/4.0.3
 #source fenv/bin/activate
 
 if [ $# -ne 8 ]; then
-  echo "batch_single_vpg.sh <experiment-number> <experiment-info> <hidden-sizes> <lr> <epochs> <gaussian-log-std> <track-length> <batch-size>"
-  echo " e.g batch_single_vpg.sh 9 smallcapacity-longtrack 32,32 0.001 500 -0.5 1000 5000"
+  echo "batch_single_vpg.sh <experiment-number> <experiment-info> \
+  							<hidden-sizes> <lr> <epochs> <gaussian-log-std> \
+							<track-length> <batch-size> <delta-time>"
+  echo " e.g batch_single_vpg.sh 9 smallcapacity-longtrack 32,32 0.001 500 -0.5 1000 5000 0.1"
   exit 1;
 fi
 
@@ -28,6 +30,7 @@ epochs=$5
 gaussian_log_std=$6
 track_length=$7
 batch_size=$8
+delta_time=$9
 
 log_every=50 #episodes
 
@@ -38,7 +41,7 @@ echo -e "hidden_sizes:$hidden_sizes \nlr: $lr \nepochs $epochs \
  	\ngaussian_log_std: $gaussian_log_std" > $base_logdir/$exp_name/exp_parameters.txt
 
 srun python vpg_train.py --epochs $epochs --batch-size $batch_size --lr $lr --hidden-sizes $hidden_sizes \
-				--gaussian-log-std "$gaussian_log_std" --track-length $track_length \
+				--gaussian-log-std "$gaussian_log_std" --track-length $track_length  --delta-time $delta_time\
 				--log-dir $base_logdir --exp-name $exp_name --log-raw-csv --log-raw-csv-every $log_every >> $base_logdir/log-${exp_name}.txt 2>&1
 python vpg_plot_train_history.py $base_logdir/$exp_name/${exp_name}_s0
 python vpg_run_model.py $base_logdir/$exp_name/${exp_name}_s0/pyt_save/model.pt --num-episodes 10

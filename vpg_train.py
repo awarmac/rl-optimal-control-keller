@@ -26,7 +26,7 @@ def get_env(args):
     if args.restore_log_dir:
         env = load_env(exp_dir)
     else:
-        env = environment_gym.Env(log_dir=exp_dir, delta_time=0.1,
+        env = environment_gym.Env(log_dir=exp_dir, delta_time=args.delta_time,
                             track_length=args.track_length, 
                             time_limit=args.time_limit)
         if args.log_raw_csv:
@@ -49,6 +49,7 @@ if __name__ == '__main__':
     parser.add_argument('--epochs', type=int, default=500)
     parser.add_argument('--track-length', type=float, default=100)
     parser.add_argument('--time-limit', type=float, default=20)
+    parser.add_argument('--delta-time', type=float, default=0.1)
     parser.add_argument('--seed', '-s', type=int, default=0)
     parser.add_argument('--gamma', type=float, default=0.99)
     parser.add_argument('--gaussian-log-std', type=float, default=-0.5)
