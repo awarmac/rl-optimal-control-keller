@@ -18,3 +18,7 @@ python vpg_run_model.py --num-episodes 1 --track-length $track_length \
 							$models_dir
 
 echo $(ls $all_figs_dir | wc -l) "figures have been created."
+
+find $models_dir/run_models_dirs -name log_1.csv | while read f; do ll=$(tail -n 1 $f); echo $f","$ll; done | tr -d "\"" | sort -t "," -k 2 -g > $models_dir/all_run_models_figs_sorted_times.txt
+echo "top 5 records in $models_dir/all_run_models_figs_sorted_times.txt"
+head -n 5 $models_dir/all_run_models_figs_sorted_times.txt
