@@ -30,7 +30,7 @@ track_length=$7
 batch_size=$8
 delta_time=$9
 
-./batch_single_vpg_general.sh $exp_num $exp_info $hidden_sizes \
+bash -x ./batch_single_vpg_general.sh $exp_num $exp_info $hidden_sizes \
 								$lr $epochs $gaussian_log_std $track_length \
 								$batch_size $delta_time \
 								$base_logdir

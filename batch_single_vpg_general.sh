@@ -1,6 +1,8 @@
 
 #!/bin/bash
 
+echo "General running"
+
 if [ $# -ne 10 ]; then
   echo "batch_single_vpg_general.sh <experiment-number> <experiment-info> \
   							<hidden-sizes> <lr> <epochs> <gaussian-log-std> \
@@ -19,7 +21,7 @@ gaussian_log_std=$6
 track_length=$7
 batch_size=$8
 delta_time=$9
-base_logdir=$10
+base_logdir=${10}
 
 log_every=50 #episodes
 
