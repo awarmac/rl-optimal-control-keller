@@ -26,4 +26,4 @@ ssh $server "ls /${base_logdir}/$exp_dir/csv | sort -t "_" -k 2 -n -r | head -n 
 			scp $server:/${base_logdir}/$exp_dir/csv/$line $exp_dir/csv/;
 		fi 
 	done;
-python turn_csv_to_fig.py --num-last-files 20 $exp_dir
+python turn_csv_to_fig.py --num-last-files $num_last_csv_logs $exp_dir
