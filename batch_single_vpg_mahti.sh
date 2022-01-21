@@ -8,7 +8,7 @@
 
 module load pytorch/1.10 gcc/9.3.0 openmpi/4.0.3
 
-if [ $# -ne 8 ]; then
+if [ $# -ne 9 ]; then
   echo "batch_single_vpg.sh <experiment-number> <experiment-info> \
   							<hidden-sizes> <lr> <epochs> <gaussian-log-std> \
 							<track-length> <batch-size> <delta-time>"

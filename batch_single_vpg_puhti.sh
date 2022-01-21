@@ -9,7 +9,7 @@
 
 module load pytorch/nvidia-19.11-py3 gcc/9.1.0 intel-mpi/18.0.5
 
-if [ $# -ne 8 ]; then
+if [ $# -ne 9 ]; then
   echo "batch_single_vpg.sh <experiment-number> <experiment-info> <hidden-sizes> \
   							<lr> <epochs> <gaussian-log-std> <track-length> \
 							<batch-size> <delta-time>"

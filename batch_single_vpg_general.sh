@@ -1,5 +1,7 @@
 
-if [ $# -ne 8 ]; then
+#!/bin/bash
+
+if [ $# -ne 10 ]; then
   echo "batch_single_vpg_general.sh <experiment-number> <experiment-info> \
   							<hidden-sizes> <lr> <epochs> <gaussian-log-std> \
 							<track-length> <batch-size> <delta-time> <base-dir>"
