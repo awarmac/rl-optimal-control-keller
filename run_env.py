@@ -43,7 +43,7 @@ if __name__ == "__main__":
         energy = 500
         while True:
             # import pdb; pdb.set_trace()
-            action = 12.2 * mass # if energy > 10 else 0 # random_actions[t]# 10 # [random.randint(0,13)] # i # 17 if t < 10 else 9 if t < 30-i else 5 # 
+            action = 8 * mass # if energy > 10 else 0 # random_actions[t]# 10 # [random.randint(0,13)] # i # 17 if t < 10 else 9 if t < 30-i else 5 # 
             #print(action)
             state, reward, done, succ = env.step([action])
             energy = state[2]

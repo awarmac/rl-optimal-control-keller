@@ -10,7 +10,7 @@ from shutil import copyfile
 if __name__ == '__main__':
     import argparse
     parser = argparse.ArgumentParser()
-    parser.add_argument('model_path', type=str)    
+    parser.add_argument('--model-path', type=str)    
     parser.add_argument('--log-dir', type=str, default=None)
     parser.add_argument('--num-episodes', type=int, default=1)
     parser.add_argument('--log-raw-csv', action='store_true')
@@ -24,25 +24,26 @@ if __name__ == '__main__':
 
 
 
-    if os.path.isdir(args.model_path):
-        models_dir = args.model_path
-        model_files = [x for x in os.listdir(models_dir) if x.endswith(".pt")]
-    else:
-        models_dir = os.path.dirname(args.model_path)
-        model_files = [os.path.basename(args.model_path)]
+    # if os.path.isdir(args.model_path):
+    #     print("shit")
+    #     models_dir = args.model_path
+    #     model_files = [x for x in os.listdir(models_dir) if x.endswith(".pt")]
+    # else:
+    models_dir = os.path.dirname(args.model_path)
+    model_files = [os.path.basename(args.model_path)]
 
     base_log_dir = args.log_dir
     if base_log_dir is None:
         base_log_dir = os.path.join(models_dir, "log-{}".format(dt.now().strftime("%Y-%m-%d_%H-%M-%S")))
 
-    model_files = sorted(model_files, 
-                    key=cmp_to_key(lambda x, y: int(x.split("l")[1].split(".")[0]) - int(y.split("l")[1].split(".")[0])),
-                    reverse=False
-                )
+    # model_files = sorted(model_files, 
+    #                 key=cmp_to_key(lambda x, y: int(x.split("l")[1].split(".")[0]) - int(y.split("l")[1].split(".")[0])),
+    #                 reverse=False
+    #             )
 
     if args.all_figs_dir is not None:
             os.makedirs(args.all_figs_dir, exist_ok=True)
-
+    print(model_files)
     for i, model_file in enumerate(model_files):
         print("{}/{}: {}".format(i, len(model_files), model_file))
         log_dir = os.path.join(base_log_dir, os.path.basename(model_file))
@@ -63,13 +64,14 @@ if __name__ == '__main__':
                 # action, _, _ = ac.step(torch.as_tensor(state, dtype=torch.float32)) # Categorical(logits=logits).sample().item()
                 obs = torch.as_tensor(state, dtype=torch.float32)
                 action = ac.pi._distribution(obs).mean
+                var_std = ac.pi._distribution(obs).stddev
                 # print(action.detach().numpy())
                 # ac.step() # Categorical(logits=logits).sample().item()
                 state, reward, done, succ = env.step(action.detach().numpy())
                 if done:
                     state = env.reset()
                     break
-            
+                print(var_std)
         from turn_csv_to_fig import turn_csv_to_fig
         turn_csv_to_fig(log_dir, num_last_files=1)
 

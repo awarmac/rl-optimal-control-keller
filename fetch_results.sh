@@ -17,6 +17,11 @@ mkdir -p $exp_dir $exp_dir/csv $exp_dir/${exp_dir}_s0
 
 echo $exp_dir
 rsync -r --exclude '*.pkl' --exclude '*.pt' $server:/${base_logdir}/$exp_dir/${exp_dir}_s0/ $exp_dir/${exp_dir}_s0/
+scp $server:/${base_logdir}/$exp_dir/exp_parameters.txt $exp_dir/
+
+track_length=$(grep "track_length" $exp_dir/exp_parameters.txt | cut -d ':' -f 2)
+echo $track_length
+
 python vpg_plot_train_history.py $exp_dir/${exp_dir}_s0
 # python vpg_run_model.py $exp_dir/${exp_dir}_s0/pyt_save/model.pt --num-episodes 5 --log-raw-csv
 
@@ -26,4 +31,4 @@ ssh $server "ls /${base_logdir}/$exp_dir/csv | sort -t "_" -k 2 -n -r | head -n 
 			scp $server:/${base_logdir}/$exp_dir/csv/$line $exp_dir/csv/;
 		fi 
 	done;
-python turn_csv_to_fig.py --num-last-files $num_last_csv_logs $exp_dir
+python turn_csv_to_fig.py --plot-kellers --plot-kellers-track-length $track_length --num-last-files $num_last_csv_logs $exp_dir

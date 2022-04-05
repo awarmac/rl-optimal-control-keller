@@ -23,11 +23,20 @@ class Battery():
     def get_state(self):
         return [self.E]
 
+    def check_step_possible_rk4(self, force, velocity, delta_time):
+        dE_dt_func = lambda e,t:(self.sigma - force*velocity)
+        new_E = runge_kutta(self.E, 0, delta_time, dE_dt_func)
+        return new_E >= 0
+        
     def consume_rk4(self, force, velocity, delta_time):
         dE_dt_func = lambda e,t:(self.sigma - force*velocity)
         old_E = self.E
         self.E = runge_kutta(self.E, 0, delta_time, dE_dt_func)
         return self.E - old_E 
+
+    def check_step_possible(self, force, velocity, delta_time):
+        delta_E = (self.sigma - force * velocity) * delta_time
+        return (self.E + delta_E) >= 0
 
     def consume(self, force, velocity, delta_time):
         delta_E = (self.sigma - force * velocity) * delta_time
@@ -58,6 +67,7 @@ class MovingObject():
         self.x += dx
         return dx
 
+
     def move(self, propulsion_force, delta_time):
         acceleration = (propulsion_force  / self.mass - self.velocity/self.tau)
         self.velocity += acceleration * delta_time 
@@ -65,7 +75,23 @@ class MovingObject():
         self.x += delta_x
         self.acceleration = acceleration
         return delta_x
+
     
+    def move_custom(self, propulsion_force, delta_time):
+        new_velocity = (self.velocity - propulsion_force * self.tau) * math.exp(-(delta_time/self.tau)) + propulsion_force * self.tau
+        
+        new_x = self.tau * (self.velocity - propulsion_force*self.tau) * (1-math.exp(-delta_time/self.tau)) + \
+                propulsion_force * self.tau * delta_time + self.x
+        dx = new_x - self.x
+        self.x = new_x
+
+        # self.acceleration = propulsion_force - ((self.velocity + new_velocity) / 2) / self.tau 
+        self.acceleration = (propulsion_force - self.velocity/self.tau)*math.exp(-delta_time/self.tau) 
+        self.velocity = new_velocity
+
+        return dx
+
+
     def reset(self):
         self.x = 0.0
         self.velocity = 0.0
@@ -187,13 +213,13 @@ class Env(gym.Env):
         return rw(self.object.x)
 
     def rwd_fn_log_barrier(self):
-        return -math.log(1 - self.object.x / self.track_length)
+        return -(1/self.time)*math.log(1 - self.object.x / self.track_length)
 
 
     def check_failure_status(self, force):
         conds = [
             [force > self.max_force, "force > self.max_force ({:.3f},{:.3f})".format(force, self.max_force)],
-            [self.battery.E <= 0, "battery.E <= 0 ({:.3f})".format(self.battery.E)],
+            [self.battery.E < 0, "battery.E <= 0 ({:.3f})".format(self.battery.E)],
             [self.object.x < -self.track_length / 2, "object.x < -track_length / 2 ({:.3f},{})".format(self.object.x, self.track_length)],
             [self.object.velocity < 0, "object.velocity < 0 ({:.3f})".format(self.object.velocity)],
         ]
@@ -204,6 +230,12 @@ class Env(gym.Env):
                 failed = True
                 message += "\n" + m
         return failed, message
+    def check_step_possible(self, action):
+        err_msg = "%r (%s) invalid" % (action, type(action))
+        assert self.action_space.contains(action), err_msg    
+        propulsion_force = action[0]
+
+        return self.battery.check_step_possible(propulsion_force, self.object.velocity, self.delta_time) 
 
     def step(self, action):        
         err_msg = "%r (%s) invalid" % (action, type(action))
@@ -214,8 +246,8 @@ class Env(gym.Env):
         if self.time == 0 and self.log_raw_csv:
             self.log_csv_current_state()
 
-        delta_x = self.object.move(propulsion_force, self.delta_time)
         delta_e = self.battery.consume(propulsion_force, self.object.velocity, self.delta_time)
+        delta_x = self.object.move(propulsion_force, self.delta_time)
         self.time += self.delta_time
         
         failed, fail_message = self.check_failure_status(force=propulsion_force)
@@ -239,6 +271,7 @@ class Env(gym.Env):
                     "environment has already returned done = True. You "
                     "should always call 'reset()' once you receive 'done = "
                     "True' -- any further steps are undefined behavior."
+                    f"time: {self.time}, state: {self.get_state()}"
                 )
             self.steps_beyond_done += 1
             reward = 0.0
